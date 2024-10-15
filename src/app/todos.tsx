@@ -1,13 +1,17 @@
+'use client'
+
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-    Todo,  
-    useListTodo,
-    useDeleteTodo,
-    useInsertTodo,
-    useUpdateTodo
-} from "../../routes";
 
+import {
+    useListTodo,
+    useInsertTodo,
+    useUpdateTodo,
+    useDeleteTodo,
+    Todo,
+    InsertTodo,
+    UpdateTodo,
+} from "../../routes";
 
 
 const TodoApp = () => {
@@ -16,25 +20,25 @@ const TodoApp = () => {
 
     const { data: todosData, isLoading, isError } = useQuery({
         queryKey: ['todos'], // Wrap the string value in an array to make it a valid QueryKey
-        queryFn: useListTodo
+        queryFn: () => useListTodo(),
     });
     
     const addTodoMutation = useMutation({
-        mutationFn: useInsertTodo,
+        mutationFn: (newTodo: InsertTodo) => useInsertTodo(newTodo),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['todos'] })
         }
     });
 
     const updateTodoMutation = useMutation({
-        mutationFn: useUpdateTodo,
+        mutationFn: (todo: UpdateTodo) => useUpdateTodo(todo),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['todos'] })
         }
     });
 
     const deleteTodoMutation = useMutation({
-        mutationFn: useDeleteTodo,
+        mutationFn: (id: string) => useDeleteTodo(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['todos'] })
         }
@@ -65,7 +69,7 @@ const TodoApp = () => {
                 Add Todo
             </button>
             <ul>
-                {todosData?.map((todo: Todo) => (
+                {todosData?.data?.map((todo: Todo) => (
                     <li key={todo.id}>
                         <input
                             type="checkbox"
