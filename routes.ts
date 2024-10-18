@@ -64,4 +64,6 @@ const useDeleteTodo = (id: string): Promise<OperationResult<Todo>> => {
   return todoOperation(async () => await todos.delete(id));
 };
 
+export { supabase };
+
 export { useListTodo, useInsertTodo, useUpdateTodo, useDeleteTodo };

@@ -1,7 +1,9 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "../../routes";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 import {
     useListTodo,
@@ -16,33 +18,52 @@ import {
 
 const TodoApp = () => {
     const [view, setView] = useState<"all" | "completed" | "completed">('all');
+    const [todos, setTodos] = useState<Todo[]>([]);
 
     const queryClient = useQueryClient();
 
-    const { data: todosData, isLoading, isError } = useQuery({
-        queryKey: ['todos'], // Wrap the string value in an array to make it a valid QueryKey
-        queryFn: () => useListTodo(),
-    });
+    useEffect(() => {
+        const fetchTodos = async () => {
+            const { data, error } = await useListTodo();
+            if (data) {
+                setTodos(data);
+            }
+        };
+
+        fetchTodos()
+
+        const subscription: RealtimeChannel = supabase
+            .channel('todos')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'todos' }, (payload) => {
+                setTodos((prev) => [...prev, payload.new as Todo]);
+            })
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'todos' }, (payload) => {
+                setTodos((prev) => {
+                    const index = prev.findIndex((todo) => todo.id === payload.new.id);
+                    prev[index] = payload.new as Todo;
+                    return [...prev];
+                });
+            })
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'todos' }, (payload) => {
+                setTodos((prev) => prev.filter((todo) => todo.id !== payload.old.id));
+            })
+            .subscribe();
+
+        return () => {
+            subscription.unsubscribe();
+        }
+    }, []);
     
     const addTodoMutation = useMutation({
-        mutationFn: (newTodo: InsertTodo) => useInsertTodo(newTodo),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['todos'] })
-        }
+        mutationFn: (newTodo: InsertTodo) => useInsertTodo(newTodo)
     });
 
     const updateTodoMutation = useMutation({
-        mutationFn: (todo: UpdateTodo) => useUpdateTodo(todo),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['todos'] })
-        }
+        mutationFn: (todo: UpdateTodo) => useUpdateTodo(todo)
     });
 
     const deleteTodoMutation = useMutation({
-        mutationFn: (id: string) => useDeleteTodo(id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['todos'] })
-        }
+        mutationFn: (id: string) => useDeleteTodo(id)
     });
 
     const onKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -59,10 +80,6 @@ const TodoApp = () => {
         }
     }
 
-    if (isLoading) return <p>Loading...</p>;
-    if (isError) return <p>Error</p>;
-
-
     return (
         <div className="todoapp">
             <h1>todos</h1>
@@ -74,7 +91,7 @@ const TodoApp = () => {
                 onKeyPress={onKeyPress}
             />
             <ul className="todo-list">
-                {todosData?.data?.map((todo: Todo) => (
+                {todos?.map((todo: Todo) => (
                     <li key={todo.id} className="view">
                         <div className="view">
                         <input
