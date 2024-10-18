@@ -12,20 +12,20 @@ const supabase = createClient<Database>(
 
 // Types
 type Todo = Tables<'todos'>;
-type InsertTodo = Omit<Todo, 'id' | 'created_at' | 'updated_at'>;
-type UpdateTodo = Partial<Omit<Todo,  'created_at' | 'updated_at'>>;
+type InsertTodoType = Omit<Todo, 'id' | 'created_at' | 'updated_at'>;
+type UpdateTodoType = Partial<Omit<Todo,  'created_at' | 'updated_at'>>;
 
-export type { Todo, InsertTodo, UpdateTodo };
+export type { Todo, InsertTodoType, UpdateTodoType };
 
 // Query functions
 const todos = {
   list: () =>
     supabase.from('todos').select(),
 
-  insert: (todo: InsertTodo) =>
+  insert: (todo: InsertTodoType) =>
     supabase.from('todos').insert(todo),
 
-  update: (id: string, todo: UpdateTodo) =>
+  update: (id: string, todo: UpdateTodoType) =>
     supabase.from('todos').update(todo).match({ id }),
 
   delete: (id: string) =>
@@ -51,19 +51,19 @@ async function todoOperation<T>(
   }
 }
 
-const useListTodo = (): Promise<OperationResult<Todo>> => {
+const ListTodos = (): Promise<OperationResult<Todo>> => {
   return todoOperation(async () => await todos.list());
 };
-const useInsertTodo = (todo: InsertTodo): Promise<OperationResult<Todo>> => {
+const InsertTodo = (todo: InsertTodoType): Promise<OperationResult<Todo>> => {
   return todoOperation(async () => await todos.insert(todo));
 };
-const useUpdateTodo = (todo: UpdateTodo): Promise<OperationResult<Todo>> => {
+const UpdateTodo = (todo: UpdateTodoType): Promise<OperationResult<Todo>> => {
   return todoOperation(async () => await todos.update(todo.id!, todo));
 };
-const useDeleteTodo = (id: string): Promise<OperationResult<Todo>> => {
+const DeleteTodo = (id: string): Promise<OperationResult<Todo>> => {
   return todoOperation(async () => await todos.delete(id));
 };
 
 export { supabase };
 
-export { useListTodo, useInsertTodo, useUpdateTodo, useDeleteTodo };
+export  { ListTodos, InsertTodo, UpdateTodo, DeleteTodo };

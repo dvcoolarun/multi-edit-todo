@@ -1,30 +1,28 @@
 'use client'
 
 import React, { useState, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { supabase } from "../../routes";
 import { RealtimeChannel } from "@supabase/supabase-js";
 
 import {
-    useListTodo,
-    useInsertTodo,
-    useUpdateTodo,
-    useDeleteTodo,
     Todo,
+    InsertTodoType,
+    UpdateTodoType,
+    ListTodos,
     InsertTodo,
     UpdateTodo,
+    DeleteTodo,
 } from "../../routes";
 
 
 const TodoApp = () => {
-    const [view, setView] = useState<"all" | "completed" | "completed">('all');
+    // const [view, setView] = useState<"all" | "completed" | "completed">('all');
     const [todos, setTodos] = useState<Todo[]>([]);
-
-    const queryClient = useQueryClient();
 
     useEffect(() => {
         const fetchTodos = async () => {
-            const { data, error } = await useListTodo();
+            const { data, error } = await ListTodos();
             if (data) {
                 setTodos(data);
             }
@@ -55,15 +53,15 @@ const TodoApp = () => {
     }, []);
     
     const addTodoMutation = useMutation({
-        mutationFn: (newTodo: InsertTodo) => useInsertTodo(newTodo)
+        mutationFn: (newTodo: InsertTodoType) => InsertTodo(newTodo)
     });
 
     const updateTodoMutation = useMutation({
-        mutationFn: (todo: UpdateTodo) => useUpdateTodo(todo)
+        mutationFn: (todo: UpdateTodoType) => UpdateTodo(todo)
     });
 
     const deleteTodoMutation = useMutation({
-        mutationFn: (id: string) => useDeleteTodo(id)
+        mutationFn: (id: string) => DeleteTodo(id)
     });
 
     const onKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
