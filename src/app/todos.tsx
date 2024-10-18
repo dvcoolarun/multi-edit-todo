@@ -22,7 +22,7 @@ const TodoApp = () => {
 
     useEffect(() => {
         const fetchTodos = async () => {
-            const { data, error } = await ListTodos();
+            const { data } = await ListTodos();
             if (data) {
                 setTodos(data);
             }
