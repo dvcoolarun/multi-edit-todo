@@ -15,7 +15,8 @@ import {
 
 
 const TodoApp = () => {
-    const [newTodo, setNewTodo] = useState<string>('');
+    const [view, setView] = useState<"all" | "completed" | "completed">('all');
+
     const queryClient = useQueryClient();
 
     const { data: todosData, isLoading, isError } = useQuery({
@@ -43,36 +44,42 @@ const TodoApp = () => {
             queryClient.invalidateQueries({ queryKey: ['todos'] })
         }
     });
-    
+
+    const onKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            
+            const target = event.target as HTMLInputElement;
+            
+            addTodoMutation.mutate({
+                title: target.value,
+                completed: false,
+            });
+
+            target.value = '';
+        }
+    }
 
     if (isLoading) return <p>Loading...</p>;
     if (isError) return <p>Error</p>;
 
 
-
     return (
-        <div>
+        <div className="todoapp">
+            <h1>todos</h1>
             <input
                 type="text"
-                value={newTodo}
-                onChange={(e) => setNewTodo(e.target.value)}
+                className="new-todo"
+                placeholder="What needs to be done?"
+                autoFocus
+                onKeyPress={onKeyPress}
             />
-            <button
-                onClick={() => {
-                    addTodoMutation.mutate({
-                        title: newTodo,
-                        completed: false,
-                    });
-                    setNewTodo('');
-                }}
-            >
-                Add Todo
-            </button>
-            <ul>
+            <ul className="todo-list">
                 {todosData?.data?.map((todo: Todo) => (
-                    <li key={todo.id}>
+                    <li key={todo.id} className="view">
+                        <div className="view">
                         <input
                             type="checkbox"
+                            className="toggle"
                             checked={todo.completed}
                             onChange={(e) => {
                                 updateTodoMutation.mutate({
@@ -82,14 +89,14 @@ const TodoApp = () => {
                                 });
                             }}
                         />
-                        <span>{todo.title}</span>
+                        <label>{todo.title}</label>
                         <button
+                            className="destroy"
                             onClick={() => {
                                 deleteTodoMutation.mutate(todo.id);
                             }}
-                        >
-                            Delete
-                        </button>
+                        ></button>
+                        </div>
                     </li>
                 ))}
             </ul>
