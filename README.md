@@ -1,3 +1,19 @@
+# React Todo MVC example (With Multi Editing)
+
+This example demonstrates how you can use Supabase Channels to build a collaborative version of the [Todo MVC](http://todomvc.com) app.
+
+The code that sets up our routes is defined in [/routes.ts](/routes.ts). By using the 
+supabase `.channel()` method, we can create a channel that listens for changes to our database. 
+
+Our React components (starting at [src/todos.tsx](src/todos.tsx)) are easy to read and update automatically.
+
+# Live demo
+
+- [Open live demo]() (Of course, open multiple times to test multiplayer)
+
+🔥 Make sure to open multiple browsers to see the app syncing automatically.
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
