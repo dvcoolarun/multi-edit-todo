@@ -1,3 +1,5 @@
+'use client'
+
 import { createClient, PostgrestError, PostgrestResponse } from '@supabase/supabase-js';
 import { Database } from './supabase';
 import { Tables } from './supabase';
