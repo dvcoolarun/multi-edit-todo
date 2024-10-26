@@ -7,7 +7,7 @@ supabase `.channel()` method, we can create a channel that listens for changes t
 
 Our React components (starting at [src/app/todos.tsx](src/app/todos.tsx)) are easy to read and update automatically.
 
-<img src="assets/recording.gif" alt="Recording of the app in action" width="100%" />
+<img src="./src/app/assets/recording.gif" alt="Recording of the app in action" witdh=400 heiht=400 />
 
 # Live demo
 
