@@ -5,7 +5,9 @@ This example demonstrates how you can use Supabase Channels to build a collabora
 The code that sets up our routes is defined in [/routes.ts](/routes.ts). By using the 
 supabase `.channel()` method, we can create a channel that listens for changes to our database. 
 
-Our React components (starting at [src/todos.tsx](src/todos.tsx)) are easy to read and update automatically.
+Our React components (starting at [src/app/todos.tsx](src/app/todos.tsx)) are easy to read and update automatically.
+
+<img src="assets/recording.gif" alt="Recording of the app in action" width="100%" />
 
 # Live demo
 
